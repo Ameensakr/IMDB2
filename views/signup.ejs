@@ -1,0 +1,130 @@
+<%- include('../partials/header') %>
+
+<div class="container">
+  <div class="signup-box">
+    <h1>Create Account</h1>
+    
+    <% if (typeof error !== 'undefined') { %>
+      <div class="error-message">
+        <p><%= error %></p>
+        <% if (typeof validationErrors !== 'undefined') { %>
+          <ul>
+            <% for (let field in validationErrors) { %>
+              <li><%= validationErrors[field] %></li>
+            <% } %>
+          </ul>
+        <% } %>
+      </div>
+    <% } %>
+
+    <form action="/signup" method="POST">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="firstName">First Name</label>
+          <div class="input-with-icon">
+            <i class="fas fa-user input-icon"></i>
+            <input type="text" id="firstName" name="firstName" required 
+              value="<%= typeof formData !== 'undefined' ? formData.firstName || '' : '' %>">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="lastName">Last Name</label>
+          <div class="input-with-icon">
+            <i class="fas fa-user input-icon"></i>
+            <input type="text" id="lastName" name="lastName" required
+              value="<%= typeof formData !== 'undefined' ? formData.lastName || '' : '' %>">
+          </div>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="email">Email</label>
+        <div class="input-with-icon">
+          <i class="fas fa-envelope input-icon"></i>
+          <input type="email" id="email" name="email" required
+            value="<%= typeof formData !== 'undefined' ? formData.email || '' : '' %>">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="mobile">Mobile Number</label>
+        <div class="input-with-icon">
+          <i class="fas fa-phone input-icon"></i>
+          <input type="tel" id="mobile" name="mobile" pattern="[0-9]{10}" placeholder="10-digit number" required
+            value="<%= typeof formData !== 'undefined' ? formData.mobile || '' : '' %>">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Gender</label>
+        <div class="gender-options">
+          <label class="radio-label">
+            <input type="radio" name="gender" value="male" required
+              <%= typeof formData !== 'undefined' && formData.gender === 'male' ? 'checked' : '' %>>
+            <i class="fas fa-male"></i> Male
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="gender" value="female"
+              <%= typeof formData !== 'undefined' && formData.gender === 'female' ? 'checked' : '' %>>
+            <i class="fas fa-female"></i> Female
+          </label>
+        </div>
+      </div>
+
+      <div class="form-group password-group">
+        <label for="password">Password</label>
+        <div class="input-with-icon">
+          <i class="fas fa-lock input-icon"></i>
+          <input type="password" id="password" name="password" required>
+          <button type="button" class="toggle-password" onclick="togglePassword('password')">
+            👁️
+          </button>
+        </div>
+      </div>
+
+      <div class="form-group password-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <div class="input-with-icon">
+          <i class="fas fa-lock input-icon"></i>
+          <input type="password" id="confirmPassword" name="confirmPassword" required>
+          <button type="button" class="toggle-password" onclick="togglePassword('confirmPassword')">
+            👁️
+          </button>
+        </div>
+      </div>
+
+      <button type="submit">Sign Up</button>
+    </form>
+    <p class="signup-link">Already have an account? <a href="/">Login</a></p>
+  </div>
+</div>
+
+<style>
+.error-message {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.error-message ul {
+  list-style-type: none;
+  padding-left: 0;
+  margin: 5px 0;
+}
+
+.error-message li {
+  margin: 5px 0;
+}
+</style>
+
+<script>
+function togglePassword(inputId) {
+  const passwordInput = document.getElementById(inputId);
+  const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+  passwordInput.setAttribute('type', type);
+}
+</script>
+
+<%- include('../partials/footer') %>

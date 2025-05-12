@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Film</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2 class="mb-4">Add New Film</h2>
+        <form action="/films/add" method="POST">
+            <div class="mb-3">
+                <label for="title" class="form-label">Title</label>
+                <input type="text" class="form-control" id="title" name="title" required>
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="releaseYear" class="form-label">Release Year</label>
+                <input type="number" class="form-control" id="releaseYear" name="releaseYear" required>
+            </div>
+            <div class="mb-3">
+                <label for="genre" class="form-label">Genre (comma-separated)</label>
+                <input type="text" class="form-control" id="genre" name="genre" required>
+            </div>
+            <div class="mb-3">
+                <label for="director" class="form-label">Director</label>
+                <input type="text" class="form-control" id="director" name="director" required>
+            </div>
+            <div class="mb-3">
+                <label for="cast" class="form-label">Cast (comma-separated)</label>
+                <input type="text" class="form-control" id="cast" name="cast">
+            </div>
+            <div class="mb-3">
+                <label for="rating" class="form-label">Rating (0-10)</label>
+                <input type="number" class="form-control" id="rating" name="rating" min="0" max="10" step="0.1">
+            </div>
+            <div class="mb-3">
+                <label for="duration" class="form-label">Duration (minutes)</label>
+                <input type="number" class="form-control" id="duration" name="duration" required>
+            </div>
+            <div class="mb-3">
+                <label for="posterUrl" class="form-label">Poster URL</label>
+                <input type="url" class="form-control" id="posterUrl" name="posterUrl">
+            </div>
+            <button type="submit" class="btn btn-primary">Add Film</button>
+            <a href="/" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 
