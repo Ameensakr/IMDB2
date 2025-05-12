@@ -4,6 +4,7 @@ const { performance } = require('perf_hooks');
 const mongoose = require('mongoose');
 const User = require('../models/user');
 const Film = require('../models/film');
+const { formatFilmTitle } = require('../controllers/filmController');
 
 const uri = 'mongodb+srv://Ameen:WKWh4dux4xotZGrg@imdb.hn3af24.mongodb.net/?retryWrites=true&w=majority&appName=imdb';
 
@@ -11,6 +12,7 @@ let testUser;
 let agent;
 const perfTestEmail = `perftest_${Date.now()}@example.com`;
 const testFilmTitles = [];
+const testFilmIds = [];
 
 beforeAll(async () => {
   await mongoose.connect(uri);
@@ -46,6 +48,10 @@ afterAll(async () => {
     if (testFilmTitles.length > 0) {
       await Film.deleteMany({ title: { $in: testFilmTitles } });
     }
+    
+    if (testFilmIds.length > 0) {
+      await Film.deleteMany({ _id: { $in: testFilmIds } });
+    }
   } catch (error) {
     console.error('Cleanup failed:', error);
   }
@@ -61,7 +67,6 @@ describe('Performance Tests', () => {
     const end = performance.now();
 
     const responseTime = end - start;
-    console.log(`GET / took ${responseTime.toFixed(2)} ms`);
 
     expect(res.statusCode).toBe(200);
     expect(responseTime).toBeLessThan(maxResponseTime);
@@ -73,7 +78,6 @@ describe('Performance Tests', () => {
     const end = performance.now();
 
     const responseTime = end - start;
-    console.log(`GET /welcome took ${responseTime.toFixed(2)} ms`);
 
     expect(res.statusCode).toBe(200);
     expect(responseTime).toBeLessThan(maxResponseTime);
@@ -85,7 +89,6 @@ describe('Performance Tests', () => {
     const end = performance.now();
 
     const responseTime = end - start;
-    console.log(`GET /films/add took ${responseTime.toFixed(2)} ms`);
 
     expect(res.statusCode).toBe(200);
     expect(responseTime).toBeLessThan(maxResponseTime);
@@ -100,19 +103,19 @@ describe('Performance Tests', () => {
     const end = performance.now();
 
     const responseTime = end - start;
-    console.log(`POST /login took ${responseTime.toFixed(2)} ms`);
 
     expect(res.statusCode).toBe(302); 
     expect(responseTime).toBeLessThan(maxResponseTime);
   }, 5000);
 
   it('POST /films/add - should respond under 2000ms', async () => {
-    const title = `Performance Test Film ${Date.now()}`;
-    testFilmTitles.push(title);
+    const rawTitle = `Performance Test Film ${Date.now()}`;
+    const formattedTitle = formatFilmTitle(rawTitle);
+    testFilmTitles.push(formattedTitle);
     
     const start = performance.now();
     const res = await agent.post('/films/add').send({
-      title,
+      title: rawTitle,
       description: 'This is a test film for performance testing',
       releaseYear: 2023,
       genre: 'Testing, Performance',
@@ -125,10 +128,14 @@ describe('Performance Tests', () => {
     const end = performance.now();
 
     const responseTime = end - start;
-    console.log(`POST /films/add took ${responseTime.toFixed(2)} ms`);
 
     expect(res.statusCode).toBe(302);
     expect(responseTime).toBeLessThan(maxResponseTime);
+    
+    const addedFilm = await Film.findOne({ title: formattedTitle });
+    if (addedFilm) {
+      testFilmIds.push(addedFilm._id);
+    }
   }, 5000);
 
   it('POST /signup - should respond under 2000ms', async () => {
@@ -149,9 +156,7 @@ describe('Performance Tests', () => {
     const end = performance.now();
 
     const responseTime = end - start;
-    console.log(`POST /signup took ${responseTime.toFixed(2)} ms`);
-    
-    console.log(`Signup status: ${res.status}`);
+
     if (res.status === 400) {
       console.log('Signup failed. Response body:', res.text);
     }

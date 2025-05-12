@@ -33,7 +33,8 @@ const filmSchema = new mongoose.Schema({
     },
     duration: {
         type: Number,  // in minutes
-        required: true
+        required: true,
+        min: 0
     },
     posterUrl: {
         type: String
@@ -48,7 +49,6 @@ const filmSchema = new mongoose.Schema({
     }
 });
 
-// Update the updatedAt timestamp before saving
 filmSchema.pre('save', function(next) {
     this.updatedAt = Date.now();
     next();

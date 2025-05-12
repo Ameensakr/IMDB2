@@ -3,7 +3,6 @@ const Film = require('../models/film');
 
 const uri = 'mongodb+srv://Ameen:WKWh4dux4xotZGrg@imdb.hn3af24.mongodb.net/?retryWrites=true&w=majority&appName=imdb';
 
-// Array to store created test films for cleanup
 const testFilmIds = [];
 
 beforeAll(async () => {

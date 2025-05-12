@@ -93,14 +93,14 @@ describe('Session Security', () => {
     });
     
     const welcomeRes = await agent.get('/welcome');
-    expect(welcomeRes.status).toBe(200); // User is logged in, so should get 200 OK
+    expect(welcomeRes.status).toBe(200); 
     
     const logoutRes = await agent.get('/logout');
     expect(logoutRes.status).toBe(302);
     expect(logoutRes.headers.location).toBe('/');
     
     const afterLogoutRes = await agent.get('/welcome');
-    expect(afterLogoutRes.status).toBe(302); // Should redirect to login
+    expect(afterLogoutRes.status).toBe(302); 
   });
 });
 

@@ -5,7 +5,6 @@ const User = require('../models/user');
 
 const uri = 'mongodb+srv://Ameen:WKWh4dux4xotZGrg@imdb.hn3af24.mongodb.net/?retryWrites=true&w=majority&appName=imdb';
 
-// Test user for authentication
 let testUser;
 let agent;
 
@@ -41,7 +40,7 @@ describe('Static Routes', () => {
     const res = await request(app).get('/');
     
     expect(res.status).toBe(200);
-    expect(res.text).toContain('login'); // Assuming login page contains "login" text
+    expect(res.text).toContain('login'); 
   });
   
   it('should serve the signup page', async () => {
@@ -49,7 +48,7 @@ describe('Static Routes', () => {
     const res = await request(app).get('/signup');
     
     expect(res.status).toBe(200);
-    expect(res.text).toContain('signup'); // Assuming signup page contains "signup" text
+    expect(res.text).toContain('signup');
   });
   
   it('should redirect authenticated users from root route to welcome page', async () => {

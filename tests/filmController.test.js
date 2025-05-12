@@ -3,6 +3,7 @@ const app = require('../app');
 const request = require('supertest');
 const Film = require('../models/film');
 const User = require('../models/user');
+const { formatFilmTitle, parseCommaSeparatedList } = require('../controllers/filmController');
 
 const uri = 'mongodb+srv://Ameen:WKWh4dux4xotZGrg@imdb.hn3af24.mongodb.net/?retryWrites=true&w=majority&appName=imdb';
 
@@ -75,11 +76,12 @@ describe('Film Features', () => {
   });
   
   it('should add a new film', async () => {
-    const title = 'Test Film ' + Date.now(); 
-    testFilmTitles.push(title); 
+    const rawTitle = 'Test Film ' + Date.now();
+    const formattedTitle = formatFilmTitle(rawTitle);
+    testFilmTitles.push(formattedTitle);
     
     const newFilm = {
-      title,
+      title: rawTitle,
       description: 'A film created for testing',
       releaseYear: 2023,
       genre: 'Testing, Drama',
@@ -97,7 +99,7 @@ describe('Film Features', () => {
     expect(res.status).toBe(302);
     expect(res.headers.location).toBe('/welcome');
     
-    const addedFilm = await Film.findOne({ title });
+    const addedFilm = await Film.findOne({ title: formattedTitle });
     expect(addedFilm).not.toBeNull();
     testFilmIds.push(addedFilm._id);
     
@@ -108,11 +110,12 @@ describe('Film Features', () => {
   });
   
   it('should display the highest-rated film', async () => {
-    const title = 'Highest Rated Test Film ' + Date.now(); 
-    testFilmTitles.push(title); 
+    const rawTitle = 'Highest Rated Test Film ' + Date.now();
+    const formattedTitle = formatFilmTitle(rawTitle);
+    testFilmTitles.push(formattedTitle);
     
     const highRatedFilm = await Film.create({
-      title,
+      title: formattedTitle,
       description: 'This should be the highest rated film',
       releaseYear: 2023,
       genre: ['Testing'],
@@ -127,53 +130,168 @@ describe('Film Features', () => {
     const res = await agent.get('/welcome');
     
     expect(res.status).toBe(200);
-    expect(res.text).toContain('Highest Rated Film:');
-    expect(res.text).toContain(title);
-    expect(res.text).toContain('⭐ 10/10');
+    expect(res.text).toContain('Highest Rated Film: ⭐ 10/10');
+    expect(res.text).toContain(formattedTitle);
   });
 
   
   it('should handle errors when fetching films', async () => {
-    const originalFind = Film.find;
-    const originalSort = {
-      sort: jest.fn().mockImplementation(() => {
-        throw new Error('Database error');
-      })
-    };
-    
-    Film.find = jest.fn().mockReturnValue(originalSort);
+    await mongoose.disconnect();
     
     const res = await agent.get('/welcome');
     
-    Film.find = originalFind;
+    await mongoose.connect(uri);
+    
     expect(res.status).toBe(500);
-  });
+  }, 10000);
   
   it('should handle errors when adding a film', async () => {
-    const title = 'Error Test Film ' + Date.now();
-    testFilmTitles.push(title); 
-    
-    const newFilm = {
-      title,
-      description: 'This film will cause an error',
-      releaseYear: 2023,
-      genre: 'Error, Testing',
-      director: 'Error Director',
-      cast: 'Error Actor',
-      rating: 5.0,
-      duration: 90,
-      posterUrl: 'https://example.com/error.jpg'
+    const invalidFilm = {
+      title: 'Test Error Film ' + Date.now(),
+      rating: 9,
+      duration: -10 
     };
     
-    const originalPrototypeSave = Film.prototype.save;
-    Film.prototype.save = jest.fn().mockImplementation(function() {
-      throw new Error('Database error');
-    });
-    
-    const res = await agent.post('/films/add').send(newFilm);
-    
-    Film.prototype.save = originalPrototypeSave;
+    const res = await agent.post('/films/add').send(invalidFilm);
     
     expect(res.status).toBe(500);
+  }, 5000);
+
+
+  // Unit testing on String (film title)
+  describe('formatFilmTitle function', () => {
+    it('should capitalize the first letter and lowercase the rest', () => {
+      expect(formatFilmTitle('tHE MATRIX')).toBe('The matrix');
+      expect(formatFilmTitle('star WARS')).toBe('Star wars');
+      expect(formatFilmTitle('INCEPTION')).toBe('Inception');
+      expect(formatFilmTitle('avatar')).toBe('Avatar');
+    });
+    
+    it('should handle edge cases properly', () => {
+      expect(formatFilmTitle('')).toBe('');
+      expect(formatFilmTitle(null)).toBe(null);
+      expect(formatFilmTitle(undefined)).toBe(undefined);
+      expect(formatFilmTitle('1917')).toBe('1917');
+      expect(formatFilmTitle('a')).toBe('A');
+    });
+  });
+  
+  // Unit testing on Arrays (comma separated lists)
+  describe('parseCommaSeparatedList function', () => {
+    it('should convert comma-separated string to array of trimmed items', () => {
+      expect(parseCommaSeparatedList('Action, Drama, Comedy')).toEqual(['Action', 'Drama', 'Comedy']);
+      expect(parseCommaSeparatedList('John Doe,  Jane Smith,Bob Johnson')).toEqual(['John Doe', 'Jane Smith', 'Bob Johnson']);
+    });
+    
+    it('should handle empty or whitespace-only items', () => {
+      expect(parseCommaSeparatedList('Action,, Drama,  ,Comedy')).toEqual(['Action', 'Drama', 'Comedy']);
+      expect(parseCommaSeparatedList('Action,   ,Comedy')).toEqual(['Action', 'Comedy']);
+    });
+    
+    it('should handle edge cases', () => {
+      expect(parseCommaSeparatedList('')).toEqual([]);
+      expect(parseCommaSeparatedList(null)).toEqual([]);
+      expect(parseCommaSeparatedList(undefined)).toEqual([]);
+      expect(parseCommaSeparatedList('SingleItem')).toEqual(['SingleItem']);
+      expect(parseCommaSeparatedList('   Trimmed   ')).toEqual(['Trimmed']);
+    });
+  });
+  
+  describe('Film rating validation', () => {
+    it('should reject a rating below 0', async () => {
+      const invalidFilm = new Film({
+        title: 'Test Film with Invalid Rating',
+        description: 'This film has a rating below 0',
+        releaseYear: 2023,
+        genre: ['Test'],
+        director: 'Test Director',
+        cast: ['Test Actor'],
+        rating: -1,
+        duration: 120,
+        posterUrl: 'https://example.com/poster.jpg'
+      });
+      
+      let validationError;
+      try {
+        await invalidFilm.validate();
+      } catch (error) {
+        validationError = error;
+      }
+      
+      expect(validationError).toBeDefined();
+      expect(validationError.errors.rating).toBeDefined();
+      expect(validationError.errors.rating.kind).toBe('min');
+    });
+    
+    it('should reject a rating above 10', async () => {
+      const invalidFilm = new Film({
+        title: 'Test Film with Invalid Rating',
+        description: 'This film has a rating above 10',
+        releaseYear: 2023,
+        genre: ['Test'],
+        director: 'Test Director',
+        cast: ['Test Actor'],
+        rating: 11,
+        duration: 120,
+        posterUrl: 'https://example.com/poster.jpg'
+      });
+      
+      let validationError;
+      try {
+        await invalidFilm.validate();
+      } catch (error) {
+        validationError = error;
+      }
+      
+      expect(validationError).toBeDefined();
+      expect(validationError.errors.rating).toBeDefined();
+      expect(validationError.errors.rating.kind).toBe('max');
+    });
+    
+    it('should accept a rating of exactly 0', async () => {
+      const validFilm = new Film({
+        title: 'Test Film with Min Rating',
+        description: 'This film has a rating of 0',
+        releaseYear: 2023,
+        genre: ['Test'],
+        director: 'Test Director',
+        cast: ['Test Actor'],
+        rating: 0,
+        duration: 120,
+        posterUrl: 'https://example.com/poster.jpg'
+      });
+      
+      let validationError;
+      try {
+        await validFilm.validate();
+      } catch (error) {
+        validationError = error;
+      }
+      
+      expect(validationError).toBeUndefined();
+    });
+    
+    it('should accept a rating of exactly 10', async () => {
+      const validFilm = new Film({
+        title: 'Test Film with Max Rating',
+        description: 'This film has a rating of 10',
+        releaseYear: 2023,
+        genre: ['Test'],
+        director: 'Test Director',
+        cast: ['Test Actor'],
+        rating: 10,
+        duration: 120,
+        posterUrl: 'https://example.com/poster.jpg'
+      });
+      
+      let validationError;
+      try {
+        await validFilm.validate();
+      } catch (error) {
+        validationError = error;
+      }
+      
+      expect(validationError).toBeUndefined();
+    });
   });
 }); 

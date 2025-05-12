@@ -28,13 +28,11 @@ describe('Error Handling', () => {
   
   it('should handle 404 errors for invalid film routes', async () => {
     const res = await request(app).get('/films/invalid-route');
-    
     expect(res.status).toBe(404);
   });
   
   it('should handle invalid HTTP methods for existing routes', async () => {
     const res = await request(app).delete('/login');
-    
     expect(res.status).toBe(404);
   });
 }); 

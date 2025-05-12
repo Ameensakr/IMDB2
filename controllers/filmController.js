@@ -1,6 +1,20 @@
 const Film = require('../models/film');
 const User = require('../models/user');
 
+const formatFilmTitle = (title) => {
+    if (!title || typeof title !== 'string' || title.length === 0) {
+        return title;
+    }
+    return title.charAt(0).toUpperCase() + title.slice(1).toLowerCase();
+};
+
+const parseCommaSeparatedList = (text) => {
+    if (!text || typeof text !== 'string') {
+        return [];
+    }
+    return text.split(',').map(item => item.trim()).filter(item => item.length > 0);
+};
+
 const initializeFilms = async () => {
     try {
         const films = [
@@ -79,8 +93,9 @@ const addFilm = async (req, res) => {
     try {
         const filmData = {
             ...req.body,
-            genre: req.body.genre.split(',').map(g => g.trim()),
-            cast: req.body.cast ? req.body.cast.split(',').map(c => c.trim()) : []
+            title: formatFilmTitle(req.body.title),
+            genre: parseCommaSeparatedList(req.body.genre),
+            cast: parseCommaSeparatedList(req.body.cast)
         };
 
         const film = new Film(filmData);
@@ -98,5 +113,7 @@ const addFilm = async (req, res) => {
 module.exports = {
     getAllFilms,
     getAddFilmForm,
-    addFilm
+    addFilm,
+    formatFilmTitle,
+    parseCommaSeparatedList
 }; 
