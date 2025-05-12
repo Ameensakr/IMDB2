@@ -12,7 +12,6 @@ body {
   flex-direction: column;
 }
 
-/* Header Styles */
 header {
   background: white;
   padding: 1rem 2rem;
@@ -25,7 +24,6 @@ header {
   font-size: 24px;
 }
 
-/* Updated Navigation Styles */
 .main-nav {
     background-color: #1a237e;
     padding: 1rem;
@@ -66,7 +64,6 @@ header {
     background-color: rgba(255,255,255,0.2);
 }
 
-/* Login/Signup Container Styles */
 .login-container, .container {
   width: 100%;
   max-width: 400px;
@@ -128,7 +125,6 @@ button:hover {
   background: #1e3c72;
 }
 
-/* Welcome Page Styles */
 .welcome-container {
   background: white;
   padding: 2rem;
@@ -191,7 +187,6 @@ button:hover {
   background: #c82333;
 }
 
-/* Footer Styles */
 footer {
   background: white;
   padding: 2rem;
@@ -215,7 +210,6 @@ footer {
   color: #1e3c72;
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
   nav ul {
     flex-direction: column;
@@ -231,7 +225,6 @@ footer {
   }
 }
 
-/* 404 Error Page Styles */
 .error-container {
     display: flex;
     justify-content: center;
@@ -287,7 +280,6 @@ footer {
     background: #1e3c72;
 }
 
-/* Signup Form Additional Styles */
 .form-row {
     display: flex;
     gap: 0.5rem;
@@ -346,7 +338,6 @@ input[type="tel"] {
     font-size: 0.9rem;
 }
 
-/* Update password input styles */
 .password-group .input-with-icon {
     position: relative;
 }
@@ -366,7 +357,6 @@ input[type="tel"] {
     padding-right: 35px;
 }
 
-/* Signup box adjustments */
 .signup-box {
     padding: 1.5rem;
 }
@@ -390,7 +380,6 @@ button[type="submit"] {
     font-size: 0.9rem;
 }
 
-/* Updated Logout Button Styles */
 .logout-button {
     display: inline-flex;
     align-items: center;

@@ -1,7 +1,6 @@
 const Film = require('../models/film');
 const User = require('../models/user');
 
-// Initialize films in the database
 const initializeFilms = async () => {
     try {
         const films = [
@@ -51,7 +50,6 @@ const initializeFilms = async () => {
             }
         ];
 
-        // Check if films already exist
         const existingFilms = await Film.find();
         if (existingFilms.length === 0) {
             await Film.insertMany(films);
@@ -60,14 +58,11 @@ const initializeFilms = async () => {
     }
 };
 
-// Call initializeFilms when the server starts
 initializeFilms();
 
-// Get all films
 const getAllFilms = async (req, res) => {
     try {
         const films = await Film.find().sort({ rating: -1 });
-        // Get user information from session or request
         const user = req.session.user || null;
         res.render('welcome', { films, user });
     } catch (error) {
@@ -76,12 +71,10 @@ const getAllFilms = async (req, res) => {
     }
 };
 
-// Get add film form
 const getAddFilmForm = (req, res) => {
     res.render('add-film');
 };
 
-// Add new film
 const addFilm = async (req, res) => {
     try {
         const filmData = {

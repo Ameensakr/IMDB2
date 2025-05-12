@@ -5,10 +5,9 @@ const User = require('../models/user');
 
 const uri = 'mongodb+srv://Ameen:WKWh4dux4xotZGrg@imdb.hn3af24.mongodb.net/?retryWrites=true&w=majority&appName=imdb';
 
-// Store test user emails to clean up only those
 const testUserEmails = [];
 
-// Generate unique test email prefixes
+
 const timestamp = Date.now();
 const generateEmail = (prefix) => {
   const email = `${prefix}_${timestamp}@example.com`;
@@ -21,7 +20,6 @@ beforeEach(async () => {
 });
 
 afterAll(async () => {
-  // Clean up test users by exact emails
   if (testUserEmails.length > 0) {
     await User.deleteMany({ email: { $in: testUserEmails } });
   }
@@ -29,7 +27,6 @@ afterAll(async () => {
   await mongoose.connection.close();
 });
 
-// Set a longer default timeout for all tests in this file
 jest.setTimeout(15000);
 
 describe('User Routes', () => {
@@ -148,15 +145,14 @@ describe('User Routes', () => {
     expect(res.headers.location).toBe('/');
   });
 
-  // New tests to increase coverage
   
   it('should handle validation errors during signup', async () => {
     const email = generateEmail('validation');
 
-    // Invalid data: missing required fields
+  
     const res = await request(app).post('/signup').send({
       firstName: 'Validation',
-      // Missing lastName and other required fields
+      
       email,
       password: 'password123',
       confirmPassword: 'password123'

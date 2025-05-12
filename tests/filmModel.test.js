@@ -11,7 +11,6 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  // Clean up test films
   if (testFilmIds.length > 0) {
     await Film.deleteMany({ _id: { $in: testFilmIds } });
   }
@@ -52,7 +51,6 @@ describe('Film Model', () => {
   });
   
   it('should update the updatedAt timestamp when saving', async () => {
-    // Create a film
     const film = new Film({
       title: 'Timestamp Test Film',
       description: 'Testing timestamps',
@@ -68,24 +66,19 @@ describe('Film Model', () => {
     const savedFilm = await film.save();
     testFilmIds.push(savedFilm._id);
     
-    // Store original timestamp
     const originalUpdatedAt = savedFilm.updatedAt;
     
-    // Wait a moment to ensure the timestamps would be different
     await new Promise(resolve => setTimeout(resolve, 100));
     
-    // Update the film
     savedFilm.title = 'Updated Timestamp Test Film';
     await savedFilm.save();
     
-    // Check timestamp was updated
     expect(savedFilm.updatedAt).not.toEqual(originalUpdatedAt);
   });
   
   it('should validate required film fields', async () => {
     const incompleteFilm = new Film({
       title: 'Incomplete Film',
-      // Missing required fields
     });
     
     let validationError;
@@ -99,14 +92,11 @@ describe('Film Model', () => {
     expect(validationError.name).toBe('ValidationError');
     expect(validationError.errors.description).toBeDefined();
     expect(validationError.errors.releaseYear).toBeDefined();
-    // Removing genre check as it might be handled differently in schema
-    // expect(validationError.errors.genre).toBeDefined();
     expect(validationError.errors.director).toBeDefined();
     expect(validationError.errors.duration).toBeDefined();
   });
   
   it('should validate rating min/max values', async () => {
-    // Test rating below min
     const filmWithLowRating = new Film({
       title: 'Low Rating Film',
       description: 'Testing rating validation',
@@ -114,7 +104,7 @@ describe('Film Model', () => {
       genre: ['Testing'],
       director: 'Test Director',
       cast: ['Test Actor'],
-      rating: -1, // Below minimum (0)
+      rating: -1, 
       duration: 120,
       posterUrl: 'https://example.com/poster.jpg'
     });
@@ -130,7 +120,6 @@ describe('Film Model', () => {
     expect(lowRatingError.name).toBe('ValidationError');
     expect(lowRatingError.errors.rating).toBeDefined();
     
-    // Test rating above max
     const filmWithHighRating = new Film({
       title: 'High Rating Film',
       description: 'Testing rating validation',
@@ -138,7 +127,7 @@ describe('Film Model', () => {
       genre: ['Testing'],
       director: 'Test Director',
       cast: ['Test Actor'],
-      rating: 11, // Above maximum (10)
+      rating: 11,
       duration: 120,
       posterUrl: 'https://example.com/poster.jpg'
     });

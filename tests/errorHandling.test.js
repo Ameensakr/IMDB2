@@ -17,7 +17,7 @@ describe('Error Handling', () => {
     const res = await request(app).get('/non-existent-route');
     
     expect(res.status).toBe(404);
-    expect(res.text).toContain('404'); // Assuming the 404 page contains "404" text
+    expect(res.text).toContain('404'); 
   });
   
   it('should handle 404 errors for non-existent API routes', async () => {
@@ -33,7 +33,6 @@ describe('Error Handling', () => {
   });
   
   it('should handle invalid HTTP methods for existing routes', async () => {
-    // Try to DELETE the login route which only accepts POST
     const res = await request(app).delete('/login');
     
     expect(res.status).toBe(404);

@@ -24,36 +24,28 @@
 </div>
 
 <script>
-    // Super aggressive back button prevention
     (function() {
-        // Check if coming from welcome page
         if (document.referrer.includes('/welcome')) {
             window.location.replace('/welcome');
             return;
         }
         
-        // Disable back button
         history.pushState(null, null, location.href);
         
-        // Add more history entries to make back button ineffective
         for (let i = 0; i < 10; i++) {
             history.pushState(null, null, location.href);
         }
         
-        // Redirect on any history navigation
         window.onpopstate = function () {
             history.go(1);
             
-            // Double-check if user is logged in via localStorage
             if (localStorage.getItem('isLoggedIn') === 'true') {
                 window.location.replace('/welcome');
             }
         };
 
-        // Clear any stored auth status
         localStorage.setItem('isLoggedIn', 'false');
 
-        // Detect backforward navigation type
         if (window.performance) {
             const navType = performance.navigation.type;
             if (navType === performance.navigation.TYPE_BACK_FORWARD) {

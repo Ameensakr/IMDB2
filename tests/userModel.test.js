@@ -3,7 +3,6 @@ const User = require('../models/user');
 
 const uri = 'mongodb+srv://Ameen:WKWh4dux4xotZGrg@imdb.hn3af24.mongodb.net/?retryWrites=true&w=majority&appName=imdb';
 
-// Store test user emails to clean up only those
 const testUserEmails = [];
 
 beforeAll(async () => {
@@ -40,15 +39,14 @@ describe('User Model', () => {
     expect(savedUser.email).toBe(userData.email);
     expect(savedUser.mobile).toBe(userData.mobile);
     expect(savedUser.gender).toBe(userData.gender);
-    expect(savedUser.password).not.toBe(userData.password); // Password should be hashed
+    expect(savedUser.password).not.toBe(userData.password);
     expect(savedUser.createdAt).toBeDefined();
-    expect(savedUser.isAdmin).toBe(false); // Default value
+    expect(savedUser.isAdmin).toBe(false);
   });
   
   it('should validate required user fields', async () => {
     const incompleteUser = new User({
       firstName: 'Incomplete',
-      // Missing required fields
     });
     
     let validationError;
@@ -71,7 +69,7 @@ describe('User Model', () => {
     const email = 'uniquetest@example.com';
     testUserEmails.push(email);
     
-    // Create first user
+
     const firstUser = new User({
       firstName: 'Unique',
       lastName: 'Test',
@@ -82,11 +80,10 @@ describe('User Model', () => {
     });
     await firstUser.save();
     
-    // Try to create second user with same email
     const duplicateUser = new User({
       firstName: 'Duplicate',
       lastName: 'Test',
-      email, // Same email
+      email, 
       mobile: '9876543210',
       gender: 'female',
       password: 'password456'
@@ -100,7 +97,7 @@ describe('User Model', () => {
     }
     
     expect(duplicateError).toBeDefined();
-    expect(duplicateError.code).toBe(11000); // MongoDB duplicate key error code
+    expect(duplicateError.code).toBe(11000); 
   });
   
   it('should validate gender enum values', async () => {
@@ -112,7 +109,7 @@ describe('User Model', () => {
       lastName: 'Test',
       email,
       mobile: '1234567890',
-      gender: 'invalid', // Not in enum ['male', 'female']
+      gender: 'invalid',
       password: 'password123'
     });
     
@@ -138,7 +135,7 @@ describe('User Model', () => {
       email,
       mobile: '1234567890',
       gender: 'male',
-      password: '12345' // Too short (min length is 6)
+      password: '12345'
     });
     
     let passwordError;
@@ -157,7 +154,6 @@ describe('User Model', () => {
     const email = 'hashtest@example.com';
     testUserEmails.push(email);
     
-    // Create a user
     const user = new User({
       firstName: 'Hash',
       lastName: 'Test',
@@ -168,14 +164,14 @@ describe('User Model', () => {
     });
     await user.save();
     
-    // Get the hashed password
+    
     const originalHash = user.password;
     
-    // Update a field other than password
+    
     user.firstName = 'Updated';
     await user.save();
     
-    // Password hash should remain the same
+  
     expect(user.password).toBe(originalHash);
   });
   
@@ -185,7 +181,7 @@ describe('User Model', () => {
     
     const plainPassword = 'password123';
     
-    // Create a user
+    
     const user = new User({
       firstName: 'Compare',
       lastName: 'Test',
@@ -196,11 +192,11 @@ describe('User Model', () => {
     });
     await user.save();
     
-    // Test correct password
+   
     const passwordMatch = await user.comparePassword(plainPassword);
     expect(passwordMatch).toBe(true);
     
-    // Test incorrect password
+  
     const wrongPasswordMatch = await user.comparePassword('wrongpassword');
     expect(wrongPasswordMatch).toBe(false);
   });

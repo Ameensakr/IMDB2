@@ -73,21 +73,17 @@
 </div>
 
 <script>
-    // Set localStorage to indicate user is logged in
     localStorage.setItem('isLoggedIn', 'true');
     
-    // Handle logout button
     document.querySelector('.logout-btn').addEventListener('click', function() {
         localStorage.removeItem('isLoggedIn');
         window.location.href = '/logout';
     });
     
-    // Block any attempt to navigate back to login/signup
     window.addEventListener('popstate', function() {
         history.pushState(null, null, location.href);
     });
     
-    // Add multiple history entries to make the back button skip past login pages
     history.pushState(null, null, location.href);
     history.pushState(null, null, location.href);
 </script>

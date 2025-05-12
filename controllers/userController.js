@@ -1,11 +1,9 @@
 const User = require('../models/user');
 
-// Signup controller
 const signup = async (req, res) => {
     try {
         const { firstName, lastName, email, mobile, gender, password, confirmPassword } = req.body;
 
-        // Check if passwords match
         if (password !== confirmPassword) {
             return res.status(400).render('signup', { 
                 error: 'Passwords do not match',
@@ -13,7 +11,6 @@ const signup = async (req, res) => {
             });
         }
 
-        // Check if user already exists
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.status(400).render('signup', { 
@@ -22,7 +19,6 @@ const signup = async (req, res) => {
             });
         }
 
-        // Create new user
         const user = new User({
             firstName,
             lastName,
@@ -36,7 +32,6 @@ const signup = async (req, res) => {
 
         
         
-        // Set user session after successful signup
         req.session.user = {
             id: user._id,
             firstName: user.firstName,
@@ -46,7 +41,6 @@ const signup = async (req, res) => {
         
         res.redirect('/');
     } catch (error) {
-        // Handle validation errors
         if (error.name === 'ValidationError') {
             const validationErrors = {};
             for (let field in error.errors) {
@@ -67,12 +61,10 @@ const signup = async (req, res) => {
     }
 };
 
-// Login controller
 const login = async (req, res) => {
     try {
         const { email, password } = req.body;
         
-        // Find user by email
         const user = await User.findOne({ email });
         if (!user) {
             return res.status(400).render('index', { 
@@ -81,7 +73,6 @@ const login = async (req, res) => {
             });
         }
 
-        // Check password using secure comparison
         const isMatch = await user.comparePassword(password);
         if (!isMatch) {
             return res.status(400).render('index', { 
@@ -90,7 +81,6 @@ const login = async (req, res) => {
             });
         }
 
-        // Set user session after successful login
         req.session.user = {
             id: user._id,
             firstName: user.firstName,
@@ -99,7 +89,7 @@ const login = async (req, res) => {
         };
 
 
-        req.session.userId = user._id; // Set the session
+        req.session.userId = user._id;
         res.redirect('/welcome');
     } catch (error) {
         res.status(500).render('index', { 
@@ -109,7 +99,6 @@ const login = async (req, res) => {
     }
 };
 
-// Logout controller
 const logout = (req, res) => {
     req.session.destroy((err) => {
         if (err) {
